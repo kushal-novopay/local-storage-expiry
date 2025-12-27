@@ -1,0 +1,47 @@
+{
+  "name": "local-storage-expiry",
+  "version": "0.1.1",
+  "description": "A vanilla TypeScript wrapper for localStorage that adds TTL and lightweight XOR+Base64 obfuscation.",
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "localStorage",
+    "ttl",
+    "expiry",
+    "expiration",
+    "storage",
+    "typescript"
+  ],
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.umd.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.umd.cjs"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "happy-dom": "^15.11.0",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.10",
+    "vitest": "^1.6.0"
+  }
+}
