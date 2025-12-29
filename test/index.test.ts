@@ -21,6 +21,17 @@ describe("local-storage-expiry", () => {
     expect(v).toEqual({ a: 1, nested: { ok: true } });
   });
 
+  it("persists data when ttl is not provided", () => {
+    set("myKey", { a: 1 });
+    expect(get<{ a: number }>("myKey")).toEqual({ a: 1 });
+
+    vi.advanceTimersByTime(10_000_000);
+    expect(get<{ a: number }>("myKey")).toEqual({ a: 1 });
+
+    flushExpired();
+    expect(get<{ a: number }>("myKey")).toEqual({ a: 1 });
+  });
+
   it("returns null after expiry and removes the item", () => {
     set("myKey", "hello", 1_000);
     expect(get<string>("myKey")).toBe("hello");

@@ -9,8 +9,8 @@ const VERSION = 1 as const;
 
 type StoredEnvelopeV1 = {
     v: typeof VERSION;
-    /** expiry epoch millis */
-    e: number;
+    /** expiry epoch millis; null means "never expires" */
+    e: number | null;
     /** payload */
     d: unknown;
 };
@@ -105,23 +105,24 @@ function isEnvelopeV1(input: unknown): input is StoredEnvelopeV1 {
     if (typeof input !== "object" || input === null) return false;
     const rec = input as Record<string, unknown>;
     if (rec.v !== VERSION) return false;
-    if (typeof rec.e !== "number" || !Number.isFinite(rec.e)) return false;
+    if (rec.e !== null && (typeof rec.e !== "number" || !Number.isFinite(rec.e))) return false;
     // d can be any JSON-serializable value; no further checks here.
     return "d" in rec;
 }
 
-function isExpired(expiryEpochMs: number, nowEpochMs: number): boolean {
+function isExpired(expiryEpochMs: number | null, nowEpochMs: number): boolean {
+    if (expiryEpochMs === null) return false;
     return nowEpochMs >= expiryEpochMs;
 }
 
 /**
- * Stores a value with a TTL in milliseconds.
+ * Stores a value with an optional TTL in milliseconds.
  * Keys are automatically namespaced with `lse_`.
  */
-export function set(key: string, value: unknown, ttlInMs: number): void {
+export function set(key: string, value: unknown, ttlInMs?: number): void {
     assertLocalStorageAvailable();
 
-    const expiry = Date.now() + ttlInMs;
+    const expiry = typeof ttlInMs === "number" ? Date.now() + ttlInMs : null;
     const envelope: StoredEnvelopeV1 = { v: VERSION, e: expiry, d: value };
     const encoded = encodeEnvelope(envelope);
     globalThis.localStorage.setItem(toNamespacedKey(key), encoded);

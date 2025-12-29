@@ -1,6 +1,6 @@
 {
   "name": "@kushalst/local-storage-expiry",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A vanilla TypeScript wrapper for localStorage that adds TTL and lightweight XOR+Base64 obfuscation.",
   "author": "",
   "license": "MIT",

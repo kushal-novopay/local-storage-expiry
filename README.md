@@ -24,7 +24,8 @@ import {
   clear,
 } from "@kushalst/local-storage-expiry";
 
-set("myKey", { hello: "world" }, 60_000);
+set("myKey", { hello: "world" }, 60_000); // expires in 60s
+set("myKeyForever", { hello: "world" }); // persisted (no TTL)
 const value = get<{ hello: string }>("myKey");
 
 remove("myKey");
@@ -41,6 +42,7 @@ All keys written by this library are stored under the `localStorage` key:
 So:
 
 - `set("token", "abc", 1000)` stores under `lse_token`
+- `set("token", "abc")` stores under `lse_token` (no TTL)
 
 This also means:
 
@@ -50,17 +52,18 @@ This also means:
 
 All functions automatically apply the `lse_` prefix.
 
-### `set(key, value, ttlInMs)`
+### `set(key, value, ttlInMs?)`
 
-Store a value that expires after `ttlInMs` milliseconds.
+Store a value that expires after `ttlInMs` milliseconds. If `ttlInMs` is omitted, the value is persisted (never expires).
 
 ```ts
 set("profile", { id: 123, name: "Kushal" }, 5 * 60_000);
+set("profile", { id: 123, name: "Kushal" });
 ```
 
 - **key**: `string` (stored as `lse_${key}`)
 - **value**: `unknown` (must be JSON-serializable)
-- **ttlInMs**: `number` (milliseconds)
+- **ttlInMs**: `number` (milliseconds, optional)
 
 Notes:
 
@@ -119,7 +122,7 @@ clear();
 
 This library does **not** store plain JSON in `localStorage`. Instead it:
 
-- Serializes `{ v, e, d }` as JSON (`v`=version, `e`=expiry epoch ms, `d`=data)
+- Serializes `{ v, e, d }` as JSON (`v`=version, `e`=expiry epoch ms or `null` for “no expiry”, `d`=data)
 - UTF-8 encodes the JSON (so Unicode is safe)
 - XORs bytes with a static internal secret
 - Base64 encodes the result
